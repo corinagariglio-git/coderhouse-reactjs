@@ -1,3 +1,4 @@
+import { NavLink } from "react-router-dom";
 import CartWidget from "./CartWidget";
 
 function NavBar() {
@@ -8,9 +9,10 @@ function NavBar() {
       </div>
 
       <nav className="navbar-links">
-        <a href="#">Inicio</a>
-        <a href="#">Productos</a>
-        <a href="#">Contacto</a>
+        <NavLink to="/">Inicio</NavLink>
+        <NavLink to="/categoria/calzas">Calzas</NavLink>
+        <NavLink to="/categoria/tops">Tops</NavLink>
+        <NavLink to="/categoria/buzos">Buzos</NavLink>
       </nav>
 
       <CartWidget />
