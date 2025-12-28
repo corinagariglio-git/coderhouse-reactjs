@@ -3,6 +3,8 @@ import "./App.css";
 import NavBar from "./components/NavBar";
 import ItemListContainer from "./components/ItemListContainer";
 import ItemDetailContainer from "./components/ItemDetailContainer";
+import Cart from "./components/Cart/Cart";
+import Checkout from "./components/Checkout/Checkout";
 
 function App() {
   return (
@@ -23,6 +25,10 @@ function App() {
         />
 
         <Route path="/item/:itemId" element={<ItemDetailContainer />} />
+
+        <Route path="/cart" element={<Cart />} />
+
+        <Route path="/checkout" element={<Checkout />} />
 
         <Route
           path="*"

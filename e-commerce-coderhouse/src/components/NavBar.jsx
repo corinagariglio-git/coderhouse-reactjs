@@ -15,7 +15,9 @@ function NavBar() {
         <NavLink to="/categoria/buzos">Buzos</NavLink>
       </nav>
 
-      <CartWidget />
+      <NavLink to="/cart">
+        <CartWidget />
+      </NavLink>
     </header>
   );
 }
