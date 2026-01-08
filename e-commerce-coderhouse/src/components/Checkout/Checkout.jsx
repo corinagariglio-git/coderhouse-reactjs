@@ -2,11 +2,15 @@ import { useContext, useState } from "react";
 import { CartContext } from "../../context/CartContext";
 import { Link } from "react-router-dom";
 
+import { db } from "../../firebase/config";
+import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+
 function Checkout() {
   const { cart, clearCart } = useContext(CartContext);
 
   const [form, setForm] = useState({ name: "", phone: "", email: "" });
   const [orderId, setOrderId] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const total = cart.reduce((acc, prod) => acc + prod.price * prod.quantity, 0);
 
@@ -16,9 +20,30 @@ function Checkout() {
 
   const handleConfirm = (e) => {
     e.preventDefault();
-    const fakeId = "ORDER-" + Date.now();
-    setOrderId(fakeId);
-    clearCart();
+    setLoading(true);
+
+    const order = {
+      buyer: form,
+      items: cart.map((prod) => ({
+        id: prod.id,
+        name: prod.name,
+        price: prod.price,
+        quantity: prod.quantity,
+      })),
+      total: total,
+      date: serverTimestamp(),
+    };
+
+    const ordersRef = collection(db, "orders");
+
+    addDoc(ordersRef, order)
+      .then((docRef) => {
+        setOrderId(docRef.id);
+        clearCart();
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   };
 
   if (orderId) {
@@ -26,7 +51,7 @@ function Checkout() {
       <main className="page">
         <section className="checkout">
           <h2>Compra confirmada ✅</h2>
-          <p>Tu número de orden es:</p>
+          <p>Tu ID de orden es:</p>
           <strong>{orderId}</strong>
 
           <br />
@@ -84,8 +109,8 @@ function Checkout() {
                 required
               />
 
-              <button className="btn" type="submit">
-                Confirmar compra
+              <button className="btn" type="submit" disabled={loading}>
+                {loading ? "Generando orden..." : "Confirmar compra"}
               </button>
             </form>
           </>

@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { getProducts } from "../data/products";
 import ItemList from "./ItemList";
+import { db } from "../firebase/config";
+import { collection, getDocs, query, where } from "firebase/firestore";
 
 function ItemListContainer({ greeting }) {
   const [products, setProducts] = useState([]);
@@ -11,16 +12,21 @@ function ItemListContainer({ greeting }) {
   useEffect(() => {
     setLoading(true);
 
-    getProducts(categoryId)
-      .then((response) => {
-        setProducts(response);
-      })
-      .catch((error) => {
-        console.log("Error cargando productos", error);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+    const productsRef = collection(db, "products");
+
+    const q = categoryId
+      ? query(productsRef, where("category", "==", categoryId))
+      : productsRef;
+
+    getDocs(q).then((resp) => {
+      const items = resp.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      setProducts(items);
+      setLoading(false);
+    });
   }, [categoryId]);
 
   return (
@@ -29,8 +35,6 @@ function ItemListContainer({ greeting }) {
 
       {loading ? (
         <p>Cargando productos...</p>
-      ) : products.length === 0 ? (
-        <p>No hay productos para esta categoría.</p>
       ) : (
         <ItemList products={products} />
       )}
